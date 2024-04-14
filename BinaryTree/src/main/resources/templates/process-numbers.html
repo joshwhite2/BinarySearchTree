@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Numbers</title>
+</head>
+<body>
+<h1>Enter Numbers</h1>
+<form id="numbersForm">
+    <label for="numbersInput">Enter numbers separated by commas:</label><br>
+    <input type="text" id="numbersInput" name="numbersInput"><br><br>
+    <button type="button" onclick="submitNumbers()">Submit</button>
+    <button type="button" onclick="showPreviousTrees()">Show Previous</button>
+</form>
+
+<div id="response"></div>
+
+<script>
+    function submitNumbers() {
+        var numbersInput = document.getElementById("numbersInput").value;
+        var numbersArray = numbersInput.split(",").map(Number);
+        fetch('/process-numbers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(numbersArray)
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("response").innerText = data;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function showPreviousTrees() {
+        fetch('/previous-trees')
+        .then(response => response.json())
+        .then(data => {
+            var previousTreesHtml = '<h2>Previous Trees</h2>';
+            previousTreesHtml += '<ul>';
+            data.forEach(tree => {
+                previousTreesHtml += '<li>' + JSON.stringify(tree) + '</li>';
+            });
+            previousTreesHtml += '</ul>';
+            document.getElementById("response").innerHTML = previousTreesHtml;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+</body>
+</html>

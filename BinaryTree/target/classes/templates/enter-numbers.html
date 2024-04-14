@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Numbers</title>
+</head>
+<body>
+<h1>Enter Numbers</h1>
+<form id="numbersForm">
+    <label for="numbersInput">Enter numbers separated by commas:</label><br>
+    <input type="text" id="numbersInput" name="numbersInput"><br><br>
+    <button type="button" onclick="submitNumbers()">Submit</button>
+    <button type="button" onclick="submitNumbersToBuildBST()">Build BST</button>
+    <button type="button" onclick="showPreviousTrees()">Show Previous Trees</button>
+</form>
+
+<div id="response"></div>
+
+<script>
+    function submitNumbers() {
+    var numbersInput = document.getElementById("numbersInput").value;
+    var numbersArray = numbersInput.split(",").map(Number);
+    fetch('/submit-numbers', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(numbersArray)
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text();
+        }
+        throw new Error('Failed to submit numbers');
+    })
+    .then(data => {
+        document.getElementById("response").innerText = data;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById("response").innerText = 'Error: ' + error.message;
+    });
+}
+function submitNumbersToBuildBST() {
+        var numbersInput = document.getElementById("numbersInput").value;
+      var numberInputObj = { numbersList: numbersInput.split(",").map(Number) };
+        fetch('/binarySearchTree/build-bst', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+             body: JSON.stringify(numberInputObj)
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            }
+            throw new Error('Failed to build BST');
+        })
+        .then(data => {
+            document.getElementById("response").innerText = data;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById("response").innerText = 'Error: ' + error.message;
+        });
+    }
+
+     function showPreviousTrees() {
+        fetch('/binarySearchTree/getAllBinaryTrees')
+        .then(response => response.json())
+        .then(data => {
+            var previousTreesHtml = '<h2>Previous Trees</h2>';
+            previousTreesHtml += '<ul>';
+            data.forEach(tree => {
+                    previousTreesHtml += '<li><pre>' + JSON.stringify(tree, null, 2) + '</pre></li>'
+                    function formatJson(jsonString) {
+
+                            return jsonString.replace(/{/g, '{\n').replace(/}/g, '\n}');
+}
+            });
+            previousTreesHtml += '</ul>';
+            document.getElementById("response").innerHTML = previousTreesHtml;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+</body>
+</html>
